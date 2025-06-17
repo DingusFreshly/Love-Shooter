@@ -1,4 +1,5 @@
 ---@diagnostic disable: undefined-global
+
 function love.load()
 
     player = {}
@@ -7,10 +8,10 @@ function love.load()
     player.y = 0
     player.xv = 0
     player.yv = 0
-    player.max_speed = 2
+    player.max_speed = 10
     player.acceleration = 0.3
     player.friction = 0.95
-
+    
     bullets = {}
     bullets.list = {}
     bullets.size = 15
@@ -150,7 +151,7 @@ function love.draw()
     end
 
     love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4)
-    
+
 end
 
 function get_direction(x1, y1, x2 ,y2)
