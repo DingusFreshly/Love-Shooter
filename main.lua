@@ -12,7 +12,7 @@ function love.load()
     mouse_y = 0
 
     player = {}
-    player.size = 0.05
+    player.size = 25
     player.x = 0
     player.y = 0
     player.xv = 0
@@ -244,9 +244,8 @@ function love.draw()
     end
 
     --player
-    local ox = ship:getWidth() / 2
-    local oy = ship:getHeight() / 2
-    love.graphics.draw(ship, player.x, player.y, player.angle, player.size, player.size, ox, oy)
+    
+    love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4, 4)
 end
 
 function get_direction(x1, y1, x2 ,y2)
