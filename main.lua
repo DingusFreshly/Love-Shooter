@@ -11,14 +11,14 @@ function love.load()
     player.y = 0
     player.xv = 0
     player.yv = 0
-    player.max_speed = 20
-    player.acceleration = 3
+    player.max_speed = 250
+    player.acceleration = 40
     player.friction = 0.95
     
     bullets = {}
     bullets.list = {}
     bullets.size = 15
-    bullets.speed = 35
+    bullets.speed = 400
     bullets.mosuedown = false
     bullets.timer = 0
     bullets.reload = 0.25
