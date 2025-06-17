@@ -39,6 +39,7 @@ function love.load()
     astroids.timer = 0
     astroids.spawn_time = 0.5
     astroids.range_time = 0.25
+    astroids.hp_range = 2
 
 end
 
@@ -139,13 +140,23 @@ function handle_astroids(dt)
         for b_i, b in pairs(bullets.list) do
             
             local dist = get_distance(a.x, a.y, b.x, b.y)
-
-            if dist <= a.size then
+            a.hit = false        
+            if dist <= a.size * a.hp then
                 
                 table.remove(bullets.list, b_i)
-                table.remove(astroids.list, i)
 
-            end
+                if a.hp == 1 then
+                    
+                    table.remove(astroids.list, i)
+
+                else
+
+                 
+                    a.hp = a.hp - 1
+
+                end
+                 a.hit = true
+             end
 
         end
 
@@ -232,7 +243,7 @@ function love.update(dt)
 
         local dx, dy = get_direction(spawn_x, spawn_y, player.x, player.y)
 
-        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size})
+        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size, hp = math.random(1, astroids.hp_range), hit = false})
         astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
 
     end
@@ -254,11 +265,20 @@ function love.draw()
     for i, b in pairs(bullets.list) do
         love.graphics.circle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size)
     end
-     love.graphics.setColor(1, 0.5, 0)
 
     --astroids
     for i, a in pairs(astroids.list) do
-        love.graphics.circle("fill", a.x + a.size / 2, a.y + a.size / 2, a.size)
+
+        if a.hit then
+               
+         love.graphics.setColor(1, 1, 1)
+      
+        else
+        love.graphics.setColor(1, 0.5, 0)
+
+        end
+
+        love.graphics.circle("fill", a.x + a.size / 2, a.y + a.size / 2, a.size * a.hp)
     end
 
     --player
