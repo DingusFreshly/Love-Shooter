@@ -8,7 +8,7 @@ function love.load()
     player.y = 0
     player.xv = 0
     player.yv = 0
-    player.max_speed = 10
+    player.max_speed = 2
     player.acceleration = 0.3
     player.friction = 0.95
     
