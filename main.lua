@@ -11,14 +11,15 @@ function love.load()
     player.y = 0
     player.xv = 0
     player.yv = 0
-    player.max_speed = 250
+    player.angle = 0
+    player.max_speed = 400
     player.acceleration = 40
     player.friction = 0.975
     
     bullets = {}
     bullets.list = {}
     bullets.size = 15
-    bullets.speed = 400
+    bullets.speed = 600
     bullets.mosuedown = false
     bullets.timer = 0
     bullets.reload = 0.25
@@ -26,6 +27,9 @@ function love.load()
     astroids = {}
     astroids.list = {}
     astroids.base_size = 10
+    astroids.range_size = 10
+    astroids.base_speed = 300
+    astroids.range_speed = 50
 
 end
 
@@ -138,15 +142,15 @@ function love.update(dt)
     handle_bullets(dt)
 
     local mouse_x, mouse_y = love.mouse.getPosition()
-    
+    local dx, dy = get_direction(player.x, player.y, mouse_x, mouse_y)
     if bullets.mosuedown and bullets.timer <= 0 then
         
-        local dx, dy = get_direction(player.x, player.y, mouse_x, mouse_y)
         table.insert(bullets.list, {x = player.x, y = player.y, dx = dx * bullets.speed, dy = dy * bullets.speed})
         bullets.timer = bullets.reload
 
     end
-
+    
+    player.angle = math.atan(dy, dx)
     if bullets.timer > 0 then
         
         bullets.timer = bullets.timer - (1 * dt)
@@ -160,8 +164,9 @@ function love.draw()
     for i, b in pairs(bullets.list) do
         love.graphics.rectangle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size, bullets.size, 4)
     end
+    
     --player
-    love.graphics.draw(ship, player.x, player.y, 0, player.size, player.size)
+    love.graphics.draw(ship, player.x, player.y, player.angle, player.size, player.size)
     
 end
 
