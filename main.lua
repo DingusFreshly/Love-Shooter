@@ -43,6 +43,8 @@ function love.load()
     astroids.hp_range = 3
 
     score = 0
+    timer = 0
+    highscore = load_highscore()
 
 end
 
@@ -146,6 +148,7 @@ function handle_astroids(dt)
                 
             table.remove(astroids.list, i)
             score = score + 1
+            player.hp =  player.hp - 1
         
          end
 
@@ -176,6 +179,19 @@ function love.mousereleased(x, y, button, istouch, pressed)
 end
 
 function love.update(dt)
+
+    if score > highscore then
+        highscore = score
+        save_highscore()
+    end
+
+    if player.hp < 1 then
+        
+        love.window.close()
+
+    else
+
+    timer = math.floor(timer + (1 * dt))
 
     local mouse_x, mouse_y = love.mouse.getPosition()
     local dx, dy = get_direction(player.x, player.y, mouse_x, mouse_y)
@@ -245,7 +261,9 @@ function love.update(dt)
 
     end
 
-   -- player.angle = math.atan(dy, dx)
+
+    end
+  
 end
 
 function love.draw()
@@ -253,8 +271,11 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)
 
     love.graphics.print("score: " .. score)
+    love.graphics.print("highscore: " .. highscore, 0, 20)
+    love.graphics.print("hp: " .. player.hp, 0, 40)
+    love.graphics.print("time: " .. timer, 0, 60)
 
-    love.graphics.setColor(0, 0.5, 1)
+     love.graphics.setColor(0, 0.5, 1)
 
     --bullets
     for i, b in pairs(bullets.list) do
@@ -285,6 +306,25 @@ function love.draw()
     --love.graphics.rotate(player.angle)
     love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4)
     --love.graphics.pop()
+end
+
+function love.quit()
+    save_highscore()
+end
+
+function load_highscore()
+    if love.filesystem.getInfo("highscore.txt") then
+        local content = love.filesystem.read("highscore.txt")
+        local val = tonumber(content)
+        if val then
+            return val
+        end
+    end
+    return 0
+end
+
+function save_highscore()
+    love.filesystem.write("highscore.txt", tostring(highscore))
 end
 
 function wrap_position(x, y, size)
