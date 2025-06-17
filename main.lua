@@ -28,7 +28,7 @@ function love.load()
     bullets.speed = 600
     bullets.mosuedown = false
     bullets.timer = 0
-    bullets.reload = 0.25
+    bullets.reload = 0.125
 
     astroids = {}
     astroids.list = {}
@@ -37,9 +37,11 @@ function love.load()
     astroids.base_speed = 350
     astroids.range_speed = 50
     astroids.timer = 0
-    astroids.spawn_time = 0.5
-    astroids.range_time = 0.25
-    astroids.hp_range = 2
+    astroids.spawn_time = 1
+    astroids.range_time = 0.5
+    astroids.hp_range = 3
+
+    score = 0
 
 end
 
@@ -87,27 +89,7 @@ function player_movement(dt)
     player.y = player.y + player.yv * dt
 
     --boundries
-
-    if player.x < 0 then
-
-        player.x = 0
-
-    end 
-    if player.x > love.graphics.getWidth() - player.size then
-
-        player.x = love.graphics.getWidth() - player.size
-
-    end
-    if player.y < 0 then
-
-        player.y = 0
-
-    end
-    if player.y > love.graphics.getHeight() - player.size then
-
-        player.y = love.graphics.getHeight() - player.size
-
-    end
+    player.x, player.y = wrap_position(player.x, player.y, player.size)
 
 
 end
@@ -133,10 +115,6 @@ function handle_astroids(dt)
         a.x = a.x + a.dx * dt
         a.y = a.y + a.dy * dt
 
-        if a.x < -a.size or a.x > love.graphics.getWidth() + 10 or a.y < -a.size or a.y > love.graphics.getHeight() + 10 then
-            table.remove(astroids.list, i)
-        end
-
         for b_i, b in pairs(bullets.list) do
             
             local dist = get_distance(a.x, a.y, b.x, b.y)
@@ -148,6 +126,7 @@ function handle_astroids(dt)
                 if a.hp == 1 then
                     
                     table.remove(astroids.list, i)
+                    score = score + 1
 
                 else
 
@@ -160,11 +139,13 @@ function handle_astroids(dt)
 
         end
 
+        a.x, a.y = wrap_position(a.x, a.y, a.size * a.hp)
+
     end
 
 end
 
-function love.mousepressed(x, y, button, istouch, pressed)
+function love.mousepressed(x, y, button, istoudch, pressed)
 
     if button == 1 then
 
@@ -259,6 +240,10 @@ end
 
 function love.draw()
 
+    love.graphics.setColor(1, 1, 1)
+
+    love.graphics.print("score: " .. score)
+
     love.graphics.setColor(0, 0.5, 1)
 
     --bullets
@@ -290,6 +275,25 @@ function love.draw()
     --love.graphics.rotate(player.angle)
     love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4)
     --love.graphics.pop()
+end
+
+function wrap_position(x, y, size)
+    local screen_w = love.graphics.getWidth()
+    local screen_h = love.graphics.getHeight()
+
+    if x < -size then
+        x = screen_w
+    elseif x > screen_w then
+        x = -size
+    end
+
+    if y < -size then
+        y = screen_h
+    elseif y > screen_h then
+        y = -size
+    end
+
+    return x, y
 end
 
 function get_direction(x1, y1, x2 ,y2)
