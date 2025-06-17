@@ -30,6 +30,9 @@ function love.load()
     astroids.range_size = 10
     astroids.base_speed = 300
     astroids.range_speed = 50
+    astroids.timer = 0
+    astroids.spawn_time = 1
+    astroids.range_time = 0.5
 
 end
 
@@ -108,9 +111,23 @@ function handle_bullets(dt)
         local b = bullets.list[i]
         b.x = b.x + b.dx * dt
         b.y = b.y + b.dy * dt
-        -- Remove bullets off-screen
+       
         if b.x < -bullets.size or b.x > love.graphics.getWidth() or b.y < -bullets.size or b.y > love.graphics.getHeight() then
             table.remove(bullets.list, i)
+        end
+    end
+
+end
+
+function handle_astroids(dt)
+    
+    for i = #astroids.list, 1, -1 do
+        local b = astroids.list[i]
+        b.x = b.x + b.dx * dt
+        b.y = b.y + b.dy * dt
+
+        if b.x < -10 or b.x > love.graphics.getWidth() + 10 or b.y < -10 or b.y > love.graphics.getHeight() + 10 then
+            table.remove(astroids.list, i)
         end
     end
 
@@ -166,8 +183,9 @@ function love.draw()
     end
     
     --player
-    love.graphics.draw(ship, player.x, player.y, player.angle, player.size, player.size)
-    
+    local ox = ship:getWidth() / 2
+    local oy = ship:getHeight() / 2
+    love.graphics.draw(ship, player.x, player.y, player.angle, player.size, player.size, ox, oy)
 end
 
 function get_direction(x1, y1, x2 ,y2)
