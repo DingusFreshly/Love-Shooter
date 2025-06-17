@@ -248,13 +248,14 @@ end
 
 function love.draw()
 
-    love.graphics.setColor(1, 1, 1)
+    love.graphics.setColor(0, 0.5, 1)
 
     --bullets
     for i, b in pairs(bullets.list) do
         love.graphics.circle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size)
     end
-    
+     love.graphics.setColor(1, 0.5, 0)
+
     --astroids
     for i, a in pairs(astroids.list) do
         love.graphics.circle("fill", a.x + a.size / 2, a.y + a.size / 2, a.size)
@@ -267,7 +268,7 @@ function love.draw()
     love.graphics.push()
     love.graphics.translate(player.x, player.y)
     love.graphics.rotate(player.angle)
-    love.graphics.rectangle("fill", -player.size / 2, -player.size * 1.5 / 2, player.size, player.size * 1.5, 4)
+    love.graphics.rectangle("fill", -player.size / 2, -player.size / 2, player.size, player.size, 4)
     love.graphics.pop()
 end
 
