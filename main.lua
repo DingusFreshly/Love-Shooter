@@ -122,7 +122,8 @@ function handle_astroids(dt)
             
             local dist = get_distance(a.x, a.y, b.x, b.y)
             a.hit = false        
-            if dist <= a.size * a.hp then
+            print(a.size, dist)
+            if dist <= a.size then
                 
                 table.remove(bullets.list, b_i)
 
@@ -133,8 +134,8 @@ function handle_astroids(dt)
 
                 else
 
-                 
                     a.hp = a.hp - 1
+                    a.size = a.size / a.hp
 
                 end
                  a.hit = true
@@ -144,7 +145,7 @@ function handle_astroids(dt)
 
         local dist = get_distance(a.x, a.y, player.x, player.y)
                   
-        if dist <= a.size * a.hp then
+        if dist <= a.size then
                 
             table.remove(astroids.list, i)
             score = score + 1
@@ -216,7 +217,8 @@ function love.update(dt)
     if astroids.timer <= 0 then
         
         local spawn_x, spawn_y
-        local size = astroids.base_size + math.random(-astroids.range_size, astroids.range_size)
+        local hp = math.random(1, astroids.hp_range)
+        local size = astroids.base_size + math.random(-astroids.range_size, astroids.range_size) * hp
 
         if math.random(0, 1) == 1 then
             
@@ -250,7 +252,7 @@ function love.update(dt)
 
         local dx, dy = get_direction(spawn_x, spawn_y, player.x, player.y)
 
-        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size, hp = math.random(1, astroids.hp_range), hit = false})
+        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size, hp = hp, hit = false})
         astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
 
     end
