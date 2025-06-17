@@ -2,20 +2,23 @@
 
 function love.load()
 
+    ship = love.graphics.newImage("Ship.png")
+    love.window.setTitle("Asteroids")
+
     player = {}
-    player.size = 20
+    player.size = 0.05
     player.x = 0
     player.y = 0
     player.xv = 0
     player.yv = 0
-    player.max_speed = 2
-    player.acceleration = 0.3
+    player.max_speed = 20
+    player.acceleration = 3
     player.friction = 0.95
     
     bullets = {}
     bullets.list = {}
     bullets.size = 15
-    bullets.speed = 3
+    bullets.speed = 35
     bullets.mosuedown = false
     bullets.timer = 0
     bullets.reload = 0.25
@@ -151,13 +154,13 @@ function love.update(dt)
 end
 
 function love.draw()
-
+    --bullets
     for i, b in pairs(bullets.list) do
         love.graphics.rectangle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size, bullets.size, 4)
     end
-
-    love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4)
-
+    --player
+    love.graphics.draw(ship, player.x, player.y, 0, player.size, player.size)
+    
 end
 
 function get_direction(x1, y1, x2 ,y2)
