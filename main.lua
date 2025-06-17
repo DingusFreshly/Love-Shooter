@@ -112,51 +112,41 @@ function handle_bullets(dt)
 end
 
 function handle_astroids(dt)
-
     for i = #astroids.list, 1, -1 do
         local a = astroids.list[i]
+
+        -- Move asteroid
         a.x = a.x + a.dx * dt
         a.y = a.y + a.dy * dt
 
+        -- Warp before we draw it (fixes flicker)
+        a.x, a.y = wrap_position(a.x, a.y, a.size)
+
+        -- Bullet collisions
         for b_i, b in pairs(bullets.list) do
-            
             local dist = get_distance(a.x, a.y, b.x, b.y)
             a.hit = false        
-            print(a.size, dist)
             if dist <= a.size then
-                
                 table.remove(bullets.list, b_i)
-
-                if a.hp == 1 then
-                    
+                if a.hp <= 1 then
                     table.remove(astroids.list, i)
                     score = score + 1
-
                 else
-
                     a.hp = a.hp - 1
-                    a.size = a.size / a.hp
-
+                    a.size = a.size / 1.5
                 end
-                 a.hit = true
-             end
-
+                a.hit = true
+            end
         end
 
+        -- Player collision
         local dist = get_distance(a.x, a.y, player.x, player.y)
-                  
         if dist <= a.size then
-                
             table.remove(astroids.list, i)
             score = score + 1
             player.hp =  player.hp - 1
-        
-         end
-
-        a.x, a.y = wrap_position(a.x, a.y, a.size * a.hp)
-
+        end
     end
-
 end
 
 function love.mousepressed(x, y, button, istoudch, pressed)
@@ -218,7 +208,7 @@ function love.update(dt)
         
         local spawn_x, spawn_y
         local hp = math.random(1, astroids.hp_range)
-        local size = astroids.base_size + math.random(-astroids.range_size, astroids.range_size) * hp
+        local size = (astroids.base_size + math.random(-astroids.range_size, astroids.range_size)) * hp
 
         if math.random(0, 1) == 1 then
             
@@ -289,14 +279,14 @@ function love.draw()
 
         if a.hit then
                
-         love.graphics.setColor(1, 1, 1)
+            love.graphics.setColor(1, 1, 1)
       
         else
-        love.graphics.setColor(1, 0.5, 0)
+            love.graphics.setColor(1, 0.5, 0)
 
         end
 
-        love.graphics.circle("fill", a.x + a.size / 2, a.y + a.size / 2, a.size * a.hp)
+       love.graphics.circle("fill", a.x, a.y, a.size)
     end
 
     --player
@@ -333,16 +323,18 @@ function wrap_position(x, y, size)
     local screen_w = love.graphics.getWidth()
     local screen_h = love.graphics.getHeight()
 
-    if x < -size then
-        x = screen_w
-    elseif x > screen_w then
-        x = -size
+    local margin = size * 1.1  -- Add a bit of leniency
+
+    if x < -margin then
+        x = screen_w + margin
+    elseif x > screen_w + margin then
+        x = -margin
     end
 
-    if y < -size then
-        y = screen_h
-    elseif y > screen_h then
-        y = -size
+    if y < -margin then
+        y = screen_h + margin
+    elseif y > screen_h + margin then
+        y = -margin
     end
 
     return x, y
