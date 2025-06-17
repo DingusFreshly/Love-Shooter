@@ -12,7 +12,7 @@ function love.load()
     mouse_y = 0
 
     player = {}
-    player.size = 25
+    player.size = 30
     player.x = 0
     player.y = 0
     player.xv = 0
