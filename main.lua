@@ -244,7 +244,7 @@ function love.draw()
     end
 
     --player
-    
+
     love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4, 4)
 end
 
