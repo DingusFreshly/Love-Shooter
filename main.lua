@@ -5,6 +5,12 @@ function love.load()
     ship = love.graphics.newImage("Ship.png")
     love.window.setTitle("Asteroids")
 
+    dx = 0
+    dy = 0
+
+    mouse_x = 0
+    mouse_y = 0
+
     player = {}
     player.size = 0.05
     player.x = 0
@@ -106,7 +112,7 @@ function player_movement(dt)
 end
 
 function handle_bullets(dt)
-    
+
     for i = #bullets.list, 1, -1 do
         local b = bullets.list[i]
         b.x = b.x + b.dx * dt
@@ -121,14 +127,25 @@ end
 
 function handle_astroids(dt)
     
-    for i = #astroids.list, 1, -1 do
-        local b = astroids.list[i]
-        b.x = b.x + b.dx * dt
-        b.y = b.y + b.dy * dt
+    if astroids.timer <= 0 then
+        
+        local spawn_x, spawn_y
 
-        if b.x < -10 or b.x > love.graphics.getWidth() + 10 or b.y < -10 or b.y > love.graphics.getHeight() + 10 then
-            table.remove(astroids.list, i)
+        if math.random(0, 1) == 1 then
+            
+            spawn_x = math.random(0, love.graphics.getWidth())
+
         end
+
+        table.insert(astroids.list, {x = player.x, y = player.y, dx = dx * astroids.speed, dy = dy * astroids.speed})
+        astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
+
+    end
+    
+    if astroids.timer > 0 then
+        
+        astroids.timer = astroids.timer - (1 * dt)
+
     end
 
 end
@@ -155,11 +172,13 @@ end
 
 function love.update(dt)
 
-    player_movement(dt)
-    handle_bullets(dt)
-
     local mouse_x, mouse_y = love.mouse.getPosition()
     local dx, dy = get_direction(player.x, player.y, mouse_x, mouse_y)
+
+    player_movement(dt)
+    handle_bullets(dt)
+   -- handle_astroids(dt)
+
     if bullets.mosuedown and bullets.timer <= 0 then
         
         table.insert(bullets.list, {x = player.x, y = player.y, dx = dx * bullets.speed, dy = dy * bullets.speed})
@@ -167,12 +186,14 @@ function love.update(dt)
 
     end
     
-    player.angle = math.atan(dy, dx)
     if bullets.timer > 0 then
         
         bullets.timer = bullets.timer - (1 * dt)
 
     end
+
+    player.angle = math.atan(dy, dx) - math.pi / 2
+
 
 end
 
