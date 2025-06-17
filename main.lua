@@ -135,6 +135,20 @@ function handle_astroids(dt)
         if a.x < -a.size or a.x > love.graphics.getWidth() + 10 or a.y < -a.size or a.y > love.graphics.getHeight() + 10 then
             table.remove(astroids.list, i)
         end
+
+        for b_i, b in pairs(bullets.list) do
+            
+            local dist = get_distance(a.x, a.y, b.x, b.y)
+
+            if dist <= a.size then
+                
+                table.remove(bullets.list, b_i)
+                table.remove(astroids.list, i)
+
+            end
+
+        end
+
     end
 
 end
@@ -233,19 +247,28 @@ function love.update(dt)
 end
 
 function love.draw()
+
+    love.graphics.setColor(1, 1, 1)
+
     --bullets
     for i, b in pairs(bullets.list) do
-        love.graphics.rectangle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size, bullets.size, 4)
+        love.graphics.circle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size)
     end
     
     --astroids
     for i, a in pairs(astroids.list) do
-        love.graphics.rectangle("fill", a.x + a.size / 2, a.y + a.size / 2, a.size, a.size, 4)
+        love.graphics.circle("fill", a.x + a.size / 2, a.y + a.size / 2, a.size)
     end
 
     --player
 
-    love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4, 4)
+    love.graphics.setColor(0.1, 1, 0.2)
+
+    love.graphics.push()
+    love.graphics.translate(player.x, player.y)
+    love.graphics.rotate(player.angle)
+    love.graphics.rectangle("fill", -player.size / 2, -player.size * 1.5 / 2, player.size, player.size * 1.5, 4)
+    love.graphics.pop()
 end
 
 function get_direction(x1, y1, x2 ,y2)
@@ -255,5 +278,8 @@ function get_direction(x1, y1, x2 ,y2)
     local len = math.sqrt(dx * dx + dy * dy)
     if len == 0 then return 0, 0 end
     return dx / len, dy / len
+end
 
+function get_distance(x1, y1, x2, y2)
+    return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
 end
