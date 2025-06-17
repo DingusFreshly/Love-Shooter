@@ -21,6 +21,7 @@ function love.load()
     player.max_speed = 400
     player.acceleration = 40
     player.friction = 0.975
+    player.hp = 3
     
     bullets = {}
     bullets.list = {}
@@ -138,6 +139,15 @@ function handle_astroids(dt)
              end
 
         end
+
+        local dist = get_distance(a.x, a.y, player.x, player.y)
+                  
+        if dist <= a.size * a.hp then
+                
+            table.remove(astroids.list, i)
+            score = score + 1
+        
+         end
 
         a.x, a.y = wrap_position(a.x, a.y, a.size * a.hp)
 
