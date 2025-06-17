@@ -20,9 +20,11 @@ function love.load()
     bullets.timer = 0
     bullets.reload = 0.25
 
+    astroids = {}
+
 end
 
-function player_movement()
+function player_movement(dt)
 
     if love.keyboard.isDown("a") then
 
@@ -45,14 +47,16 @@ function player_movement()
 
     end
 
+    --cap speed
+
     if player.xv > player.max_speed then
-        player.xv = player.max_speed
+        player.xv = player.max_speed  
     elseif player.xv < -player.max_speed then
         player.xv = -player.max_speed
     end
 
     if player.yv > player.max_speed then
-        player.yv = player.max_speed
+        player.yv = player.max_speed 
     elseif player.yv < -player.max_speed then
         player.yv = -player.max_speed
     end
@@ -60,8 +64,10 @@ function player_movement()
     player.xv = player.xv * player.friction
     player.yv = player.yv * player.friction
 
-    player.x = player.x + player.xv
-    player.y = player.y + player.yv
+    player.x = player.x + player.xv * dt
+    player.y = player.y + player.yv * dt
+
+    --boundries
 
     if player.x < 0 then
 
@@ -87,12 +93,12 @@ function player_movement()
 
 end
 
-function handle_bullets()
+function handle_bullets(dt)
     
     for i = #bullets.list, 1, -1 do
         local b = bullets.list[i]
-        b.x = b.x + b.dx
-        b.y = b.y + b.dy
+        b.x = b.x + b.dx * dt
+        b.y = b.y + b.dy * dt
         -- Remove bullets off-screen
         if b.x < -bullets.size or b.x > love.graphics.getWidth() or b.y < -bullets.size or b.y > love.graphics.getHeight() then
             table.remove(bullets.list, i)
@@ -123,8 +129,8 @@ end
 
 function love.update(dt)
 
-    player_movement()
-    handle_bullets()
+    player_movement(dt)
+    handle_bullets(dt)
 
     local mouse_x, mouse_y = love.mouse.getPosition()
     
