@@ -32,7 +32,7 @@ function love.load()
 
     astroids = {}
     astroids.list = {}
-    astroids.base_size = 10
+    astroids.base_size = 25
     astroids.range_size = 10
     astroids.base_speed = 300
     astroids.range_speed = 50
@@ -126,26 +126,15 @@ function handle_bullets(dt)
 end
 
 function handle_astroids(dt)
-    
-    if astroids.timer <= 0 then
-        
-        local spawn_x, spawn_y
 
-        if math.random(0, 1) == 1 then
-            
-            spawn_x = math.random(0, love.graphics.getWidth())
+    for i = #astroids.list, 1, -1 do
+        local b = astroids.list[i]
+        b.x = b.x + b.dx * dt
+        b.y = b.y + b.dy * dt
 
+        if b.x < -10 or b.x > love.graphics.getWidth() + 10 or b.y < -10 or b.y > love.graphics.getHeight() + 10 then
+            table.remove(astroids.list, i)
         end
-
-        table.insert(astroids.list, {x = player.x, y = player.y, dx = dx * astroids.speed, dy = dy * astroids.speed})
-        astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
-
-    end
-    
-    if astroids.timer > 0 then
-        
-        astroids.timer = astroids.timer - (1 * dt)
-
     end
 
 end
@@ -177,7 +166,7 @@ function love.update(dt)
 
     player_movement(dt)
     handle_bullets(dt)
-   -- handle_astroids(dt)
+    handle_astroids(dt)
 
     if bullets.mosuedown and bullets.timer <= 0 then
         
@@ -192,6 +181,53 @@ function love.update(dt)
 
     end
 
+    if astroids.timer <= 0 then
+        
+        local spawn_x, spawn_y
+
+        if math.random(0, 1) == 1 then
+            
+            spawn_x = math.random(0, love.graphics.getWidth())
+
+             if math.random(0, 1) == 1 then
+
+                spawn_y = 0
+
+             else
+
+                spawn_y = love.graphics.getHeight()
+                
+             end
+
+        else
+
+            spawn_y = math.random(0, love.graphics.getHeight())
+
+             if math.random(0, 1) == 1 then
+
+                spawn_x = 0
+
+             else
+
+                spawn_x = love.graphics.getWidth()
+                
+             end
+
+        end
+
+        local dx, dy = get_direction(spawn_x, spawn_y, player.x, player.y)
+
+        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed})
+        astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
+
+    end
+    
+    if astroids.timer > 0 then
+        
+        astroids.timer = astroids.timer - (1 * dt)
+
+    end
+
     player.angle = math.atan(dy, dx) - math.pi / 2
 
 
@@ -203,6 +239,11 @@ function love.draw()
         love.graphics.rectangle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size, bullets.size, 4)
     end
     
+    --astroids
+    for i, a in pairs(astroids.list) do
+        love.graphics.rectangle("fill", a.x + astroids.base_size / 2, a.y + astroids.base_size / 2, astroids.base_size, astroids.base_size, 4)
+    end
+
     --player
     local ox = ship:getWidth() / 2
     local oy = ship:getHeight() / 2
