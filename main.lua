@@ -32,13 +32,13 @@ function love.load()
 
     astroids = {}
     astroids.list = {}
-    astroids.base_size = 25
+    astroids.base_size = 35
     astroids.range_size = 10
-    astroids.base_speed = 300
+    astroids.base_speed = 350
     astroids.range_speed = 50
     astroids.timer = 0
-    astroids.spawn_time = 1
-    astroids.range_time = 0.5
+    astroids.spawn_time = 0.5
+    astroids.range_time = 0.25
 
 end
 
@@ -128,11 +128,11 @@ end
 function handle_astroids(dt)
 
     for i = #astroids.list, 1, -1 do
-        local b = astroids.list[i]
-        b.x = b.x + b.dx * dt
-        b.y = b.y + b.dy * dt
+        local a = astroids.list[i]
+        a.x = a.x + a.dx * dt
+        a.y = a.y + a.dy * dt
 
-        if b.x < -10 or b.x > love.graphics.getWidth() + 10 or b.y < -10 or b.y > love.graphics.getHeight() + 10 then
+        if a.x < -a.size or a.x > love.graphics.getWidth() + 10 or a.y < -a.size or a.y > love.graphics.getHeight() + 10 then
             table.remove(astroids.list, i)
         end
     end
@@ -184,6 +184,7 @@ function love.update(dt)
     if astroids.timer <= 0 then
         
         local spawn_x, spawn_y
+        local size = astroids.base_size + math.random(-astroids.range_size, astroids.range_size)
 
         if math.random(0, 1) == 1 then
             
@@ -191,11 +192,11 @@ function love.update(dt)
 
              if math.random(0, 1) == 1 then
 
-                spawn_y = 0
+                spawn_y = -size
 
              else
 
-                spawn_y = love.graphics.getHeight()
+                spawn_y = love.graphics.getHeight() + size
                 
              end
 
@@ -205,11 +206,11 @@ function love.update(dt)
 
              if math.random(0, 1) == 1 then
 
-                spawn_x = 0
+                spawn_x = -size
 
              else
 
-                spawn_x = love.graphics.getWidth()
+                spawn_x = love.graphics.getWidth() + size
                 
              end
 
@@ -217,7 +218,7 @@ function love.update(dt)
 
         local dx, dy = get_direction(spawn_x, spawn_y, player.x, player.y)
 
-        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed})
+        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size})
         astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
 
     end
@@ -228,9 +229,7 @@ function love.update(dt)
 
     end
 
-    player.angle = math.atan(dy, dx) - math.pi / 2
-
-
+    player.angle = math.atan(dy, dx)
 end
 
 function love.draw()
@@ -241,7 +240,7 @@ function love.draw()
     
     --astroids
     for i, a in pairs(astroids.list) do
-        love.graphics.rectangle("fill", a.x + astroids.base_size / 2, a.y + astroids.base_size / 2, astroids.base_size, astroids.base_size, 4)
+        love.graphics.rectangle("fill", a.x + a.size / 2, a.y + a.size / 2, a.size, a.size, 4)
     end
 
     --player
