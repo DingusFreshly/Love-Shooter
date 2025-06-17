@@ -13,7 +13,7 @@ function love.load()
     player.yv = 0
     player.max_speed = 250
     player.acceleration = 40
-    player.friction = 0.95
+    player.friction = 0.975
     
     bullets = {}
     bullets.list = {}
@@ -24,6 +24,8 @@ function love.load()
     bullets.reload = 0.25
 
     astroids = {}
+    astroids.list = {}
+    astroids.base_size = 10
 
 end
 
