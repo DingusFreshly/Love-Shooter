@@ -184,7 +184,7 @@ function love.update(dt)
 
     if bullets.mosuedown and bullets.timer <= 0 then
         
-        table.insert(bullets.list, {x = player.x, y = player.y, dx = dx * bullets.speed, dy = dy * bullets.speed})
+        table.insert(bullets.list, {x = player.x + bullets.size / 2, y = player.y + bullets.size / 2, dx = dx * bullets.speed, dy = dy * bullets.speed})
         bullets.timer = bullets.reload
 
     end
@@ -243,7 +243,7 @@ function love.update(dt)
 
     end
 
-    player.angle = math.atan(dy, dx)
+   -- player.angle = math.atan(dy, dx)
 end
 
 function love.draw()
@@ -265,11 +265,11 @@ function love.draw()
 
     love.graphics.setColor(0.1, 1, 0.2)
 
-    love.graphics.push()
-    love.graphics.translate(player.x, player.y)
-    love.graphics.rotate(player.angle)
-    love.graphics.rectangle("fill", -player.size / 2, -player.size / 2, player.size, player.size, 4)
-    love.graphics.pop()
+    --love.graphics.push()
+    --love.graphics.translate(player.x, player.y)
+    --love.graphics.rotate(player.angle)
+    love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4)
+    --love.graphics.pop()
 end
 
 function get_direction(x1, y1, x2 ,y2)
