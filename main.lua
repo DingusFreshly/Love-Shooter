@@ -27,7 +27,7 @@ function love.load()
     bullets.list = {}
     bullets.size = 15
     bullets.speed = 600
-    bullets.mosuedown = false
+    player.mousedown = false
     bullets.timer = 0
     bullets.reload = 0.125
 
@@ -42,8 +42,10 @@ function love.load()
     astroids.range_time = 0.5
     astroids.hp_range = 3
 
-    score = 0
-    time = 0
+    game = {}
+    game.score = 0
+    game.time = 0
+    game.game_on = false
 
 end
 
@@ -130,7 +132,7 @@ function handle_astroids(dt)
                 table.remove(bullets.list, b_i)
                 if a.hp <= 1 then
                     table.remove(astroids.list, i)
-                    score = score + 1
+                    game.score = game.score + 1
                 else
                     a.hp = a.hp - 1
                     a.size = a.size / 1.5
@@ -144,7 +146,7 @@ function handle_astroids(dt)
         local dist = get_distance(a.x, a.y, player.x + player_radius, player.y + player_radius)
         if dist <= a.size + player_radius then
             table.remove(astroids.list, i)
-            score = score + 1
+            game.score = game.score + 1
             player.hp =  player.hp - 1
         end
 
@@ -159,7 +161,7 @@ function love.mousepressed(x, y, button, istoudch, pressed)
 
     if button == 1 then
 
-        bullets.mosuedown = true
+        player.mousedown = true
 
     end
 
@@ -169,7 +171,7 @@ function love.mousereleased(x, y, button, istouch, pressed)
 
     if button == 1 then
 
-        bullets.mosuedown = false
+        player.mousedown = false
 
     end
 
@@ -177,127 +179,165 @@ end
 
 function love.update(dt)
 
-    if player.hp < 1 then
-        
-        love.window.close()
+    mouse_x, mouse_y = love.mouse.getPosition()
 
-    else
-
-    time = time + (1 * dt)
-
-    local mouse_x, mouse_y = love.mouse.getPosition()
-    local dx, dy = get_direction(player.x, player.y, mouse_x, mouse_y)
-
-    player_movement(dt)
-    handle_bullets(dt)
-    handle_astroids(dt)
-
-    if bullets.mosuedown and bullets.timer <= 0 then
-        
-        table.insert(bullets.list, {x = player.x + bullets.size / 2, y = player.y + bullets.size / 2, dx = dx * bullets.speed, dy = dy * bullets.speed})
-        bullets.timer = bullets.reload
-
-    end
+   if game.game_on then
     
-    if bullets.timer > 0 then
-        
-        bullets.timer = bullets.timer - (1 * dt)
-
-    end
-
-    if astroids.timer <= 0 then
-        
-        local spawn_x, spawn_y
-        local hp = math.random(1, astroids.hp_range)
-        local size = (astroids.base_size + math.random(-astroids.range_size, astroids.range_size)) * hp
-
-        if math.random(0, 1) == 1 then
+        if player.hp < 1 then
             
-            spawn_x = math.random(0, love.graphics.getWidth())
-
-             if math.random(0, 1) == 1 then
-
-                spawn_y = -size
-
-             else
-
-                spawn_y = love.graphics.getHeight() + size
-                
-             end
+            game.game_on = false
 
         else
 
-            spawn_y = math.random(0, love.graphics.getHeight())
+            game.time = game.time + (1 * dt)
+          
+            local dx, dy = get_direction(player.x, player.y, mouse_x, mouse_y)
 
-             if math.random(0, 1) == 1 then
+            player_movement(dt)
+            handle_bullets(dt)
+            handle_astroids(dt)
 
-                spawn_x = -size
-
-             else
-
-                spawn_x = love.graphics.getWidth() + size
+            if player.mousedown and bullets.timer <= 0 then
                 
-             end
+                table.insert(bullets.list, {x = player.x + bullets.size / 2, y = player.y + bullets.size / 2, dx = dx * bullets.speed, dy = dy * bullets.speed})
+                bullets.timer = bullets.reload
+
+            end
+            
+            if bullets.timer > 0 then
+                
+                bullets.timer = bullets.timer - (1 * dt)
+
+            end
+
+            if astroids.timer <= 0 then
+                
+                local spawn_x, spawn_y
+                local hp = math.random(1, astroids.hp_range)
+                local size = (astroids.base_size + math.random(-astroids.range_size, astroids.range_size)) * hp
+
+                if math.random(0, 1) == 1 then
+                    
+                    spawn_x = math.random(0, love.graphics.getWidth())
+
+                    if math.random(0, 1) == 1 then
+
+                        spawn_y = -size
+
+                    else
+
+                        spawn_y = love.graphics.getHeight() + size
+                        
+                    end
+
+                else
+
+                    spawn_y = math.random(0, love.graphics.getHeight())
+
+                    if math.random(0, 1) == 1 then
+
+                        spawn_x = -size
+
+                    else
+
+                        spawn_x = love.graphics.getWidth() + size
+                        
+                    end
+
+                end
+
+                local dx, dy = get_direction(spawn_x, spawn_y, player.x, player.y)
+
+                table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size, hp = hp, hit_timer = 0})
+                astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
+
+            end
+            
+            if astroids.timer > 0 then
+                    
+                    astroids.timer = astroids.timer - (1 * dt)
+
+            end
 
         end
 
-        local dx, dy = get_direction(spawn_x, spawn_y, player.x, player.y)
+    else
 
-        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size, hp = hp, hit_timer = 0})
-        astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
+        bullets.list = {}
+        astroids.list = {}
 
-    end
-    
-    if astroids.timer > 0 then
-        
-        astroids.timer = astroids.timer - (1 * dt)
+        game.score = 0
+        game.time = 0
 
-    end
+        player.hp = 3
+        player.x = (love.graphics.getWidth() - player.size) / 2
+        player.y = (love.graphics.getHeight() - player.size) / 2
+        player.xv = 0
+        player.yv = 0
 
-
-    end
+   end
   
 end
 
 function love.draw()
 
-    love.graphics.setColor(1, 1, 1)
+    if game.game_on then
+        
+        love.graphics.setColor(1, 1, 1)
 
-    love.graphics.print("score: " .. score)
-    love.graphics.print("hp: " .. player.hp, 0, 40)
-    love.graphics.print("time: " .. math.floor(time), 0, 20)
+        love.graphics.print("score: " .. game.score)
+        love.graphics.print("hp: " .. player.hp, 0, 40)
+        love.graphics.print("time: " .. math.floor(game.time), 0, 20)
 
-     love.graphics.setColor(0, 0.5, 1)
+        love.graphics.setColor(0, 0.5, 1)
 
-    --bullets
-    for i, b in pairs(bullets.list) do
-        love.graphics.circle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size)
-    end
+        --bullets
+        for i, b in pairs(bullets.list) do
+            love.graphics.circle("fill", b.x + bullets.size / 2, b.y + bullets.size / 2, bullets.size)
+        end
 
-    --astroids
-    for i, a in pairs(astroids.list) do
+        --astroids
+        for i, a in pairs(astroids.list) do
 
-        if a.hit_timer > 0 then
-               
-            love.graphics.setColor(1, 1, 1)
-      
-        else
-            love.graphics.setColor(1, 0.5, 0)
+            if a.hit_timer > 0 then
+                
+                love.graphics.setColor(1, 1, 1)
+        
+            else
+                love.graphics.setColor(1, 0.5, 0)
+
+            end
+
+        love.graphics.circle("fill", a.x, a.y, a.size)
+        end
+
+        --player
+
+        love.graphics.setColor(0.1, 1, 0.2)
+        love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4)
+            
+    else
+
+        love.graphics.setColor(1, 1, 1)
+
+        local size_x = 100
+        local size_y = 30
+        local pos_x = (love.graphics.getWidth() - size_x) / 2
+        local pos_y = (love.graphics.getHeight() - size_y) / 2
+
+        love.graphics.rectangle("fill", pos_x, pos_y, size_x, size_y)
+
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.print("PLAY", pos_x, pos_y, 0, 3, 2)
+
+        if mouse_x > pos_x and mouse_x < pos_x + size_x and mouse_y > pos_y and mouse_y < pos_y + size_y and player.mousedown then
+            
+            game.game_on = true
 
         end
 
-       love.graphics.circle("fill", a.x, a.y, a.size)
     end
 
-    --player
-
-    love.graphics.setColor(0.1, 1, 0.2)
-
-    --love.graphics.push()
-    --love.graphics.translate(player.x, player.y)
-    --love.graphics.rotate(player.angle)
-    love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4)
-    --love.graphics.pop()
 end
 
 function wrap_position(x, y, size)
