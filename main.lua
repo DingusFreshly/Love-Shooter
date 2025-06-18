@@ -112,6 +112,7 @@ function handle_bullets(dt)
 end
 
 function handle_astroids(dt)
+
     for i = #astroids.list, 1, -1 do
         local a = astroids.list[i]
 
@@ -125,8 +126,8 @@ function handle_astroids(dt)
         -- Bullet collisions
         for b_i, b in pairs(bullets.list) do
             local dist = get_distance(a.x, a.y, b.x, b.y)
-            a.hit = false        
             if dist <= a.size then
+                  a.hit_timer = 0.1  
                 table.remove(bullets.list, b_i)
                 if a.hp <= 1 then
                     table.remove(astroids.list, i)
@@ -135,17 +136,23 @@ function handle_astroids(dt)
                     a.hp = a.hp - 1
                     a.size = a.size / 1.5
                 end
-                a.hit = true
+    
             end
         end
 
         -- Player collision
-        local dist = get_distance(a.x, a.y, player.x, player.y)
-        if dist <= a.size then
+        local player_radius = player.size / 2
+        local dist = get_distance(a.x, a.y, player.x + player_radius, player.y + player_radius)
+        if dist <= a.size + player_radius then
             table.remove(astroids.list, i)
             score = score + 1
             player.hp =  player.hp - 1
         end
+
+         if a.hit_timer > 0 then
+           a.hit_timer = a.hit_timer - dt
+        end
+
     end
 end
 
@@ -242,7 +249,7 @@ function love.update(dt)
 
         local dx, dy = get_direction(spawn_x, spawn_y, player.x, player.y)
 
-        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size, hp = hp, hit = false})
+        table.insert(astroids.list, {x = spawn_x, y = spawn_y, dx = dx * astroids.base_speed, dy = dy * astroids.base_speed, size = size, hp = hp, hit_timer = 0})
         astroids.timer = astroids.spawn_time + math.random(-astroids.range_time, astroids.range_time)
 
     end
@@ -277,7 +284,7 @@ function love.draw()
     --astroids
     for i, a in pairs(astroids.list) do
 
-        if a.hit then
+        if a.hit_timer > 0 then
                
             love.graphics.setColor(1, 1, 1)
       
