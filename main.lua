@@ -43,7 +43,7 @@ function love.load()
     astroids.hp_range = 3
 
     score = 0
-    timer = 0
+    time = 0
 
 end
 
@@ -177,6 +177,8 @@ end
 
 function love.update(dt)
 
+    time = time + (1 * dt)
+
     if player.hp < 1 then
         
         love.window.close()
@@ -265,7 +267,7 @@ function love.draw()
 
     love.graphics.print("score: " .. score)
     love.graphics.print("hp: " .. player.hp, 0, 40)
-    love.graphics.print("time: " .. timer, 0, 20)
+    love.graphics.print("time: " .. time, 0, 20)
 
      love.graphics.setColor(0, 0.5, 1)
 
