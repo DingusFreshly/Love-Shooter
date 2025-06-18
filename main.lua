@@ -42,6 +42,8 @@ function love.load()
     astroids.range_time = 0.5
     astroids.hp_range = 3
 
+    explosions = {}
+
     game = {}
     game.score = 0
     game.time = 0
@@ -132,6 +134,8 @@ function handle_astroids(dt)
                 table.remove(bullets.list, b_i)
                 if a.hp <= 1 then
                     table.remove(astroids.list, i)
+                    spawn_explosion(a.x, a.y, 25)
+
                     game.score = game.score + 1
                 else
                     a.hp = a.hp - 1
@@ -146,6 +150,8 @@ function handle_astroids(dt)
         local dist = get_distance(a.x, a.y, player.x + player_radius, player.y + player_radius)
         if dist <= a.size + player_radius then
             table.remove(astroids.list, i)
+            spawn_explosion(a.x, a.y, 15)
+
             game.score = game.score + 1
             player.hp =  player.hp - 1
         end
@@ -179,6 +185,7 @@ end
 
 function love.update(dt)
 
+    player.angle = math.atan2(mouse_y - (player.y + player.size/2), mouse_x - (player.x + player.size/2))
     mouse_x, mouse_y = love.mouse.getPosition()
 
    if game.game_on then
@@ -188,6 +195,17 @@ function love.update(dt)
             game.game_on = false
 
         else
+
+            for i = #explosions, 1, -1 do
+    local e = explosions[i]
+    e.x = e.x + e.dx * dt
+    e.y = e.y + e.dy * dt
+    e.life = e.life + dt
+    if e.life > e.max_life then
+        table.remove(explosions, i)
+    end
+end
+
 
             game.time = game.time + (1 * dt)
           
@@ -283,11 +301,19 @@ function love.draw()
 
     if game.game_on then
         
+        
         love.graphics.setColor(1, 1, 1)
 
         love.graphics.print("score: " .. game.score)
         love.graphics.print("hp: " .. player.hp, 0, 40)
         love.graphics.print("time: " .. math.floor(game.time), 0, 20)
+
+for _, e in ipairs(explosions) do
+    local alpha = 1 - (e.life / e.max_life)
+    love.graphics.setColor(1, 0.5, 0, alpha)
+    love.graphics.circle("fill", e.x, e.y, e.size * alpha)
+end
+
 
         love.graphics.setColor(0, 0.5, 1)
 
@@ -313,8 +339,13 @@ function love.draw()
 
         --player
 
-        love.graphics.setColor(0.1, 1, 0.2)
-        love.graphics.rectangle("fill", player.x, player.y, player.size, player.size, 4)
+       love.graphics.setColor(0.1, 1, 0.2)
+        love.graphics.push()
+        love.graphics.translate(player.x + player.size / 2, player.y + player.size / 2) 
+        love.graphics.rotate(player.angle)
+        love.graphics.rectangle("fill", -player.size / 2, -player.size / 2, player.size, player.size, 4)
+        love.graphics.pop()
+
             
     else
 
@@ -339,6 +370,25 @@ function love.draw()
     end
 
 end
+
+function spawn_explosion(x, y, amount)
+    for i = 1, amount do
+        local angle = math.random() * 2 * math.pi
+        local speed = math.random(100, 300)
+        local dx = math.cos(angle) * speed
+        local dy = math.sin(angle) * speed
+        table.insert(explosions, {
+            x = x,
+            y = y,
+            dx = dx,
+            dy = dy,
+            life = 0,
+            max_life = 0.5,
+            size = math.random(4, 8)
+        })
+    end
+end
+
 
 function wrap_position(x, y, size)
     local screen_w = love.graphics.getWidth()
