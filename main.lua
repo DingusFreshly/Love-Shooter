@@ -177,15 +177,13 @@ end
 
 function love.update(dt)
 
-    time = time + (1 * dt)
-
     if player.hp < 1 then
         
         love.window.close()
 
     else
 
-    timer = math.floor(timer + (1 * dt))
+    time = time + (1 * dt)
 
     local mouse_x, mouse_y = love.mouse.getPosition()
     local dx, dy = get_direction(player.x, player.y, mouse_x, mouse_y)
@@ -267,7 +265,7 @@ function love.draw()
 
     love.graphics.print("score: " .. score)
     love.graphics.print("hp: " .. player.hp, 0, 40)
-    love.graphics.print("time: " .. time, 0, 20)
+    love.graphics.print("time: " .. math.floor(time), 0, 20)
 
      love.graphics.setColor(0, 0.5, 1)
 
