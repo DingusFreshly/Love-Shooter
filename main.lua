@@ -13,8 +13,8 @@ function love.load()
 
     player = {}
     player.size = 30
-    player.x = (love.graphics.getWidth() - size) / 2
-    player.y = (love.graphics.getHeight() - size) / 2
+    player.x = (love.graphics.getWidth() - player.size) / 2
+    player.y = (love.graphics.getHeight() - player.size) / 2
     player.xv = 0
     player.yv = 0
     player.angle = 0
